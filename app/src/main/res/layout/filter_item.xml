@@ -8,6 +8,12 @@
     android:padding="6dip">
 
     <TextView
+        android:id="@+id/text_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/full_name" />
+
+    <TextView
         android:id="@+id/text_dateRange"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

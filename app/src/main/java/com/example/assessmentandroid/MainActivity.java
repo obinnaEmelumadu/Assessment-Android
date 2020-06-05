@@ -1,13 +1,19 @@
 package com.example.assessmentandroid;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.android.volley.Cache;
 import com.android.volley.Network;
@@ -24,6 +30,7 @@ import com.example.assessmentandroid.filter.FilterItem;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,6 +38,12 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+
+import de.siegmar.fastcsv.reader.CsvParser;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.CsvRow;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -39,23 +52,41 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private FilterItem[] mDataset;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         //set data
         mDataset = getmDataset(R.raw.dummy_filter);
-
         recyclerView = (RecyclerView) findViewById(R.id.recycler_list);
 
-        //recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new FilterAdapter(mDataset);
         recyclerView.setAdapter(mAdapter);
+        getAndCacheCSV();
         getFilterJson();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.filter_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_filter:
+                getFilterJson();
+                break;
+        }
+        return true;
     }
 
     private FilterItem[] getmDataset(@IdRes int id){
@@ -113,6 +144,28 @@ public class MainActivity extends AppCompatActivity {
             });
             queue.add(stringRequest);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void getAndCacheCSV(){
+        InputStream inputStream = getResources().openRawResource(R.raw.car_ownsers_data);
+        Reader inputStreamReader = new InputStreamReader(inputStream);
+        CsvReader csvReader = new CsvReader();
+
+        try (CsvParser csvParser = csvReader.parse(inputStreamReader) ){
+            CsvRow row;
+            while ((row = csvParser.nextRow()) != null) {
+                if (row.getOriginalLineNumber() > 1) {
+                    System.out.println("Read line: " + row);
+                    System.out.println("First column of line: " + row.getField(0));
+                }
+            }
+
+            inputStreamReader.close();
+            inputStream.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
