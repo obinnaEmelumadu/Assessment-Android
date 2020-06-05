@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Assessment Android</string>
+    <string name="date_range">Date Range: </string>
+    <string name="gender">Gender: </string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="countries">Countries: </string>
+    <string name="color">Color: </string>
+    <string name="all">ALL</string>
+    <string name="no_data">Sorry, there is no data</string>
 </resources>
