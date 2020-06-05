@@ -9,6 +9,17 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.android.volley.Cache;
+import com.android.volley.Network;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.assessmentandroid.filter.FilterItem;
 import com.google.gson.Gson;
 
@@ -44,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new FilterAdapter(mDataset);
         recyclerView.setAdapter(mAdapter);
+        getFilterJson();
     }
 
     private FilterItem[] getmDataset(@IdRes int id){
@@ -75,7 +87,33 @@ public class MainActivity extends AppCompatActivity {
         } finally {
             is.close();
         }
-
         return writer.toString();
+    }
+
+    private void getFilterJson(){
+        try {
+            RequestQueue queue = Volley.newRequestQueue(this);
+            String url ="https://android-json-test-api.herokuapp.com/accounts";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Gson gson = new Gson();
+                            mDataset =  gson.fromJson(response, FilterItem[].class);
+                            mAdapter = new FilterAdapter(mDataset);
+                            mAdapter.notifyDataSetChanged();
+                            recyclerView.setAdapter(mAdapter);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Volley error", String.valueOf(error));
+                }
+            });
+            queue.add(stringRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
