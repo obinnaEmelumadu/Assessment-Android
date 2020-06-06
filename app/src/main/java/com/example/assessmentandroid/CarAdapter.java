@@ -59,10 +59,10 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder>  
     public void onBindViewHolder(@NonNull CarAdapter.CarViewHolder holder, final int position) {
         CarItem item = mDataset[position];
 
-        holder.name.setText("Full NAme: " +  item.first_name + " " +item.last_name);
+        holder.name.setText("Full Name: " +  item.first_name + " " +item.last_name);
         holder.email.setText("Email: " +  item.email);
         holder.country.setText("Country: " +  item.country);
-        holder.car.setText("Car: " +  item.car_model);
+        holder.car.setText("Car: " +  item.car_model +", "+ item.car_model_year+", "+ item.car_color);
         holder.gender.setText("Gender: " +  item.gender);
         holder.job.setText("Job: " +  item.job_title);
         holder.bio.setText("Bio: " +  item.bio);

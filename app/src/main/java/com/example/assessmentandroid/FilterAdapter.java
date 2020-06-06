@@ -16,7 +16,7 @@ import com.example.assessmentandroid.filter.FilterItem;
 
 public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.FilterViewHolder>  {
     private FilterItem[] mDataset;
-    private Context mcon;
+    private OnItemClick mCallback;
 
     public static class FilterViewHolder extends RecyclerView.ViewHolder {
         public LinearLayout layout;
@@ -44,9 +44,8 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.FilterView
     @NonNull
     @Override
     public FilterAdapter.FilterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mcon = parent.getContext();
-        LinearLayout v = (LinearLayout) LayoutInflater.from(mcon).inflate(R.layout.filter_item, parent,false);
-
+        LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.filter_item, parent,false);
+        mCallback = (OnItemClick) parent.getContext();
         FilterViewHolder vh = new FilterViewHolder(v);
         return vh;
     }
@@ -64,9 +63,7 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.FilterView
         holder.layout.setOnClickListener(   new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(mcon, CarActivity.class);
-                i.putExtra("data", item.toString());
-                mcon.startActivity(i);
+                mCallback.onClick(item);
             }
         });
     }

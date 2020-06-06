@@ -1,14 +1,20 @@
 package com.example.assessmentandroid;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.assessmentandroid.filter.CarItem;
@@ -28,6 +34,7 @@ public class CarActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private CarItem[] mDataset;
+    private ProgressDialog progressDialog;
 
     @SuppressLint("ResourceType")
     @Override
@@ -44,15 +51,52 @@ public class CarActivity extends AppCompatActivity {
         });
 
         //set data
-        String data = (String) getIntent().getSerializableExtra("data");
-
-        mDataset = getmDataset(data);
+        mDataset = (CarItem[]) getIntent().getSerializableExtra("data");
         recyclerView = findViewById(R.id.recycler_list);
 
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new CarAdapter(mDataset);
         recyclerView.setAdapter(mAdapter);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.car_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_filter:
+                CarActivity.SaveDataAsyncTasks saveDataAsyncTasks = new CarActivity.SaveDataAsyncTasks();
+                saveDataAsyncTasks.execute();
+                break;
+        }
+        return true;
+    }
+
+    public class SaveDataAsyncTasks extends AsyncTask<String, String, String> {
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        protected String doInBackground(String... params) {
+            return "Executed";
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(CarActivity.this);
+            progressDialog.setMessage("Caching CSV, Please Wait");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            progressDialog.dismiss();
+        }
     }
 
     private CarItem[] getmDataset(String data){
